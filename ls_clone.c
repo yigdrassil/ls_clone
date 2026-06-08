@@ -95,24 +95,32 @@ void print_long(const char *dir, const char *name)
 
     struct stat st;
 
-    if ( lstat(fullpath, &st) < 0 ) //fill up the empty stats struct with info, if there is nothing, then we use perror to print error message, and we exit
+    if(lstat(fullpath, &st) > 0)
     {
         perror(name);
 
-        return; //Cause da func is void
+        return;
     }
 
-    char modes[11];
 
-mode_string(st.st_mode, modes);
+    char modes[11];
+    mode_string(st.st_mode, modes);
 
     struct passwd *pw = getpwuid(st.st_uid);
-    struct group *gr = getgrgid(st.st_gid);
+    struct group *gr = getgrgid(st.st_uid);
 
     const char *user = pw ? pw->pw_name : "?";
     const char *group = gr ? gr->gr_name : "?";
 
     printf("%s %s %s %s \n", modes, user, group, name);
+
+
+
+
+
+
+
+
 
 
 
@@ -134,7 +142,7 @@ int main(int argc, char **argv)
         }
         else
         {
-            
+                
                 fprintf(stderr, "usage: %s [-a] [path]\n", argv[0]); // print an error message to the standard output, and give a hint of usage
 
                 return 1;
@@ -149,6 +157,7 @@ int main(int argc, char **argv)
 
     if(!dirpath)
     {
+        
         perror("opendir");  // Tis one sends out nicely formatted error messages :D
 
         return 1;
