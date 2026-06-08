@@ -49,7 +49,7 @@ int main(int argc, char **argv)
         printf( "%s \n", (*entry).d_name );  // entry->d_name can be rewritten as (*entry).d_name  you basically dereference the pointer
     }
 
-asdfasdfasdf
+
     return 0;
 
 }
