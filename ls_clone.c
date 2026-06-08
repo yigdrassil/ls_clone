@@ -8,17 +8,41 @@
 
 #include <errno.h> // Using this to handle possible errors
 
+#include <unistd.h> // Need this for the getopt() function to process cmd line arguments
+
+
+int show_all = 0; //declaring an option for the ls command
 
 int main(int argc, char **argv)
 {
 
-    const char *path = argv[1];
+    int opt;
+
+    while ( (opt = getopt(argc, argv, "a")) != -1 )
+    {
+        if (opt == 'a')
+        {
+            show_all = 1;
+            printf("option set\n"); //testing if the code comes in here :)  didn't set up debugging yet
+        }
+        else
+        {
+            
+                fprintf(stderr, "usage: %s [-a] [path]\n", argv[0]); // print an error message to the standard output, and give a hint of usage
+
+                return 1;
+        }
+    }
+
+
+
+    const char *path = (optind < argc) ? argv[optind] : ".";
 
     DIR *dirpath = opendir(path);
 
     if(!dirpath)
     {
-        perror("opendir");
+        perror("opendir");  // Tis one sends out nicely formatted error messages :D
 
         return 1;
     }
@@ -46,9 +70,16 @@ int main(int argc, char **argv)
 
     while ( (entry = readdir(dirpath)) != NULL )
     {
+        if ( !show_all && entry->d_name[0] == '.' ) // if the first character in the directory name starts with a . then ignore it
+        {
+            continue; 
+        } 
+            
+
         printf( "%s \n", (*entry).d_name );  // entry->d_name can be rewritten as (*entry).d_name  you basically dereference the pointer
     }
 
+    closedir(dirpath);
 
     return 0;
 
