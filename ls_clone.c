@@ -152,7 +152,7 @@ int main(int argc, char **argv)
         if (opt == 'a')
         {
             show_all = 1;
-            printf("option set\n"); //testing if the code comes in here :)  didn't set up debugging yet
+            // printf("option set\n"); //testing if the code comes in here :)  didn't set up debugging yet
         }
         else if( opt == 'l' )
         {
