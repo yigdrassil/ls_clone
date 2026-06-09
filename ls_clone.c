@@ -23,7 +23,17 @@
 #include <grp.h>
 
 
+/**
+ * adding the lib for the time functionality
+ * 
+ */
+#include <time.h>
+
+
+
 int show_all = 0; //declaring an option for the ls command
+
+int long_format = 0;
 
 
 /**
@@ -85,6 +95,12 @@ void mode_string(mode_t mode, char *str)
 
 /**
  * The print function fo print user names and the group
+ * 
+ * Update [09.06.2026]
+ * Adding the time data to the function
+ * 
+ * Check the manpage for strftime ->  man 3 strftime
+ * 
  */
 
 void print_long(const char *dir, const char *name) {
@@ -104,11 +120,17 @@ void print_long(const char *dir, const char *name) {
     const char *user = pw ? pw->pw_name : "?";
     const char *group = gr ? gr->gr_name : "?";
 
-    printf("%s %s %s %s \n", modes, user, group, name);
+    //printf("%s %s %s %s \n", modes, user, group, name);
 
 
 
+    char timebuff[64];
 
+    struct tm *tm = localtime(&stats.st_mtim.tv_sec);
+
+    strftime(timebuff, sizeof(timebuff), "%b %e %H:%M", tm);
+
+    printf("%s %lu %s %s %ld %s %s\n", modes, (unsigned long)stats.st_nlink, user, group, (long)stats.st_size, timebuff, name);
 
 
 
@@ -125,17 +147,21 @@ int main(int argc, char **argv)
 
     int opt;
 
-    while ( (opt = getopt(argc, argv, "a")) != -1 )
+    while ( (opt = getopt(argc, argv, "al")) != -1 )
     {
         if (opt == 'a')
         {
             show_all = 1;
             printf("option set\n"); //testing if the code comes in here :)  didn't set up debugging yet
         }
+        else if( opt == 'l' )
+        {
+            long_format = 1;
+        }
         else
         {
                 
-                fprintf(stderr, "usage: %s [-a] [path]\n", argv[0]); // print an error message to the standard output, and give a hint of usage
+                fprintf(stderr, "usage: %s [-al] [path]\n", argv[0]); // print an error message to the standard output, and give a hint of usage
 
                 return 1;
         }
@@ -181,11 +207,19 @@ int main(int argc, char **argv)
         if ( !show_all && entry->d_name[0] == '.' ) // if the first character in the directory name starts with a . then ignore it
         {
             continue; 
-        } 
-        
-        print_long(path, entry->d_name);
+        }
 
-        //printf( "%s \n", (*entry).d_name );  // entry->d_name can be rewritten as (*entry).d_name  you basically dereference the pointer
+        if ( long_format )
+        {
+            print_long(path, entry->d_name);
+        }
+        else
+        {
+            printf( "%s \n", (*entry).d_name );  // entry->d_name can be rewritten as (*entry).d_name  you basically dereference the pointer
+        }
+        
+
+        
     }
 
     closedir(dirpath);
