@@ -87,28 +87,20 @@ void mode_string(mode_t mode, char *str)
  * The print function fo print user names and the group
  */
 
-void print_long(const char *dir, const char *name)
-{
-    char fullpath[4096]; //This is the full path length on linux, would take a jab at windows but i am too tired at this point :) maybe next time
+void print_long(const char *dir, const char *name) {
+    char fullpath[4096];
+    snprintf(fullpath, sizeof(fullpath), "%s/%s", dir, name);
 
-    snprintf(fullpath, sizeof(fullpath), "%s%s", dir, name);
-
-    struct stat st;
-
-    if(lstat(fullpath, &st) > 0)
-    {
+    struct stat stats;
+    if (lstat(fullpath, &stats) < 0) {
         perror(name);
-
         return;
     }
-
-
     char modes[11];
-    mode_string(st.st_mode, modes);
+    mode_string(stats.st_mode, modes);
 
-    struct passwd *pw = getpwuid(st.st_uid);
-    struct group *gr = getgrgid(st.st_uid);
-
+    struct passwd *pw = getpwuid(stats.st_uid);
+    struct group  *gr = getgrgid(stats.st_gid);
     const char *user = pw ? pw->pw_name : "?";
     const char *group = gr ? gr->gr_name : "?";
 
