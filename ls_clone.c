@@ -23,10 +23,7 @@
 #include <grp.h>
 
 
-/**
- * adding the lib for the time functionality
- * 
- */
+// adding the lib for the time functionality
 #include <time.h>
 
 
